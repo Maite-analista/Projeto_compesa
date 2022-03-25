@@ -1,4 +1,4 @@
-############An·lises Descritiva###################
+############An√°lises Descritiva###################
 library(pastecs)
 library(corrplot)
 library(xts)
@@ -7,74 +7,102 @@ library(forecast)
 dados = read.csv2("C:/Users/COPEL3/Documents/Informa/Compessa/pressao_vazao_tratamento_rod.csv" , sep="," , dec=".")
 attach(dados)
 
-dim(dados)    # mostra a dimens„o dos dados
-names(dados)  # mostra os nomes das vari·veis
+dim(dados)    # mostra a dimens√£o dos dados
+names(dados)  # mostra os nomes das vari√°veis
 str(dados)
-summary(dados) # medidas de posiÁ„o para vari·veis
+summary(dados) # medidas de posi√ß√£o para vari√°veis
 
 
-#Vari·veis categÛricas
+#Vari√°veis categ√≥ricas
 dados <- within(dados, {
-  Turno <- factor(Turno, labels=c('Manh„','Tarde', 'Noite', 'Madrugada'))
+  Turno <- factor(Turno, labels=c('Manh√£','Tarde', 'Noite', 'Madrugada'))
 })
 
 dados <- within(dados, {
-  Estacao <- factor(Estacao, labels=c('Ver„o','Outono'))
+  Estacao <- factor(Estacao, labels=c('Ver√£o','Outono'))
 })
 
 par(bg="#fdf6e3") 
 par(mfrow=c(1,2),bg="#fdf6e3") 
 
 contagem = table(Turno)
-nomes = c('Manh„','Tarde', 'Noite', 'Madrugada')
+nomes = c('Manh√£','Tarde', 'Noite', 'Madrugada')
 porcent = round(contagem/sum(contagem)*100,2)
 rotulo=paste(nomes," (",porcent,"%",")",sep="")
 pie(table(Turno),labels=rotulo, main="Turnos", col=c("#99CCFF","#99CCCC","#9999FF", "#99FFCC"))  
 
 contagem2 = table(Estacao)
-nomes2 = c('Ver„o','Outono')
+nomes2 = c('Ver√£o','Outono')
 porcent2 = round(contagem2/sum(contagem2)*100,2)
 rotulo2=paste(nomes2," (",porcent2,"%",")",sep="")
-pie(table(Estacao),labels=rotulo2, main="EstaÁ„o", col=c("#99CCCC","#99CCFF"))  
+pie(table(Estacao),labels=rotulo2, main="Esta√ß√£o", col=c("#99CCCC","#99CCFF"))  
 
+#distribuicao de frequencia univariada
+dFrequencia.turno = table(Turno)
+dFrequencia.estacao = table(Estacao)
+plot(dFrequencia.turno)
+plot(dFrequencia.estacao)
 
+install.packages("qcc")
+library("qcc")
 
-#Vari·veis numÈricas
+par(bg="#fdf6e3") 
+par(mfrow=c(1,2),bg="#fdf6e3") 
+pareto.chart(dFrequencia.turno)
+pareto.chart(dFrequencia.estacao)
+
+#distribui√ß√µes bivariadas
+par(bg="#fdf6e3") 
+par(mfrow=c(3,2),bg="#fdf6e3") 
+boxplot(Press√É.o...PC.52..mca. ~ Turno, xlab = "Turno", ylab = "Press√£o PC", 
+        main = "Press√£o PC vs Turnos")
+boxplot(Pressao...PM.D52..mca. ~ Turno, xlab = "Turno", ylab = "Press√£o PM", 
+        main = "Press√£o PM vs Turnos")
+boxplot(Vazao..L.s. ~ Turno, xlab = "Turno", ylab = "Vaz√£o", 
+        main = "Vaz√£o vs Turnos")
+
+boxplot(Press√É.o...PC.52..mca. ~ Estacao, xlab = "Esta√ß√£o", ylab = "Press√£o PC", 
+        main = "Press√£o PC vs Esta√ß√µes")
+boxplot(Pressao...PM.D52..mca. ~ Estacao, xlab = "Esta√ß√£o", ylab = "Press√£o PM", 
+        main = "Press√£o PM vs Esta√ß√µes")
+boxplot(Vazao..L.s. ~ Estacao, xlab = "Esta√ß√£o", ylab = "Vaz√£o", 
+        main = "Vaz√£o vs Esta√ß√µes")
+
+#Vari√°veis num√©ricas
 descr <- stat.desc(dados[2:4]) # Medidas descritivas
 round(descr, 2)  #arredondar para 2 casas decimais
 
 cat1 = replicate(3745, "PC")
 cat2 = replicate(3745, "PM")
-pressao = c(Press√.o...PC.52..mca., Pressao...PM.D52..mca.)
+pressao = c(Press√É.o...PC.52..mca., Pressao...PM.D52..mca.)
 categoria = c(cat1, cat2)
 
 boxplot(pressao~categoria, col = c("lightblue", "lightgreen"),
-        boxwex=0.4, xlab="", ylab="Press„o", main = "Boxplots das Vari·veis Press„o")
+        boxwex=0.4, xlab="", ylab="Press√£o", main = "Boxplots das Vari√°veis Press√£o")
 
 boxplot(Vazao..L.s., col = "lightgreen",
-        boxwex=0.4, xlab="", ylab="Vaz„o", main = "Boxplots da Vari·vel Vaz„o")
+        boxwex=0.4, xlab="", ylab="Vaz√£o", main = "Boxplots da Vari√°vel Vaz√£o")
 
 ## Histogramas
-hist(Press√.o...PC.52..mca.,prob=T,main='Histograma da press„o PC', xlab="Press„o PC", ylab="Densidade")
-lines(density(Press√.o...PC.52..mca.),col='red')
-rug(Press√.o...PC.52..mca.)
+hist(Press√É.o...PC.52..mca.,prob=T,main='Histograma da press√£o PC', xlab="Press√£o PC", ylab="Densidade")
+lines(density(Press√É.o...PC.52..mca.),col='red')
+rug(Press√É.o...PC.52..mca.)
 
-hist(Pressao...PM.D52..mca.,prob=T,main='Histograma da press„o PM', xlab="Press„o PM", ylab="Densidade")
+hist(Pressao...PM.D52..mca.,prob=T,main='Histograma da press√£o PM', xlab="Press√£o PM", ylab="Densidade")
 lines(density(Pressao...PM.D52..mca.),col='red')
 rug(Pressao...PM.D52..mca.)
 
-hist(Vazao..L.s.,prob=T,main='Histograma da vaz„o', xlab="Vaz„o", ylab="Densidade")
+hist(Vazao..L.s.,prob=T,main='Histograma da vaz√£o', xlab="Vaz√£o", ylab="Densidade")
 lines(density(Vazao..L.s.),col='red')
 rug(Vazao..L.s.)
 
-plot(Vazao..L.s., Press√.o...PC.52..mca., main="Press„o Ponto CrÌtico x Vaz„o", 
-     xlab="Press„o PC", ylab="Vaz„o", 
-     col="darkgreen", pch=20)   #n˙mero do pch altera o tipo de marcador
+plot(Vazao..L.s., Press√É.o...PC.52..mca., main="Press√£o Ponto Cr√≠tico x Vaz√£o", 
+     xlab="Press√£o PC", ylab="Vaz√£o", pch=20)   
+     abline(lm(Press√É.o...PC.52..mca. ~ Vazao..L.s.), col="red")
 
-plot(Vazao..L.s., Pressao...PM.D52..mca., main="Press„o Ponto MÈdio x Vaz„o", 
-     xlab="Press„o PM", ylab="Vaz„o", 
-     col="darkgreen", pch=20)   #n˙mero do pch altera o tipo de marcador
+plot(Vazao..L.s., Pressao...PM.D52..mca., main="Press√£o Ponto M√©dio x Vaz√£o", 
+     xlab="Press√£o PM", ylab="Vaz√£o", pch=20)   
+     abline(lm(Pressao...PM.D52..mca.~Vazao..L.s.), col = "red")  
 
-#CorrelaÁ„o
+#Correla√ß√£o
 corrplot(cor(dados[2:4]), method = "number", type = "lower", diag = TRUE)
-
